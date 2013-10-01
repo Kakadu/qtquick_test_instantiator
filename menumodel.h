@@ -16,9 +16,12 @@ public:
 
     Q_INVOKABLE void drop(int n) {
         qDebug() << _items;
-        beginRemoveRows(QModelIndex(), 0, n-1);
-        for (int i=0; i<n; i++)
+        beginRemoveRows(QModelIndex(), 0, n-1); // doesn't work
+		// next line works as expected but why should I use indexes from tail?
+		//beginRemoveRows(QModelIndex(), _items.count()-n, _items.count()-1);
+        for (int i=0; i<n; i++) { 
             _items.pop_front();
+		}
         endRemoveRows();
         qDebug() << _items;
     }
