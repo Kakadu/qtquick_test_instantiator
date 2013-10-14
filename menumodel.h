@@ -5,25 +5,42 @@
 #include <QtCore/QAbstractItemModel>
 #include <QDebug>
 
+class menumodel;
+
+extern menumodel* backmodel;
+extern menumodel* forwardmodel;
+
 class menumodel : public QAbstractItemModel
 {
     Q_OBJECT
     QVector<QString> _items;
     QHash<int, QByteArray> _roles;
-
+    QString _name;
 public:
-    explicit menumodel();
+    explicit menumodel(QString);
+
+    /* concats [reverse(v)] end [_items] */
+    void addItems(QVector<QString> &v) {
+        beginInsertRows(QModelIndex(), 0, v.count()-1);
+        foreach (const QString& s, v) {
+            _items.push_front(s);
+        }
+        endInsertRows();
+    }
 
     Q_INVOKABLE void drop(int n) {
+        menumodel* dest = (this == backmodel) ? forwardmodel : backmodel;
+        QVector<QString> ans;
         qDebug() << _items;
         beginRemoveRows(QModelIndex(), 0, n-1); // doesn't work
-		// next line works as expected but why should I use indexes from tail?
-		//beginRemoveRows(QModelIndex(), _items.count()-n, _items.count()-1);
-        for (int i=0; i<n; i++) { 
+        for (int i=0; i<n; i++) {
+            ans.push_back(_items.at(0));
             _items.pop_front();
-		}
+        }
         endRemoveRows();
         qDebug() << _items;
+
+        dest->addItems(ans);
     }
     Q_INVOKABLE void add(QString s) {
         beginInsertRows(QModelIndex(), 0, 0);

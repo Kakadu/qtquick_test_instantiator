@@ -13,8 +13,10 @@ int main(int argc, char *argv[])
     QQmlComponent component(&engine);
 
     QQmlContext *ctxt = engine.rootContext();
-    menumodel *m = new menumodel();
-    ctxt->setContextProperty("backModel", m);
+    backmodel = new menumodel(QString("back"));
+    forwardmodel = new menumodel(QString("forward"));
+    ctxt->setContextProperty("backModel",    backmodel);
+    ctxt->setContextProperty("forwardModel", forwardmodel);
 
     component.loadUrl(QUrl("main.qml"));
     foreach (QQmlError s, component.errors()) {

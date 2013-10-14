@@ -5,25 +5,14 @@ import QtQuick.Layouts 1.0
 ApplicationWindow {
     width: 800
     height: 600
-    MouseArea {
-        anchors.fill: parent
-        onClicked: {
-            Qt.quit();
-        }
-    }
+
     toolBar: ToolBar {
         RowLayout {
             Menu {
                 id: backContextMenu
                 Instantiator {
                     model: backModel
-                    MenuItem {
-                        text: model.text
-                        onTriggered: {
-                            console.log("triggered: " + model.text)
-                            //controller.backTo(model.text,-1);
-                        }
-                    }
+                    MenuItem { text: model.text }
                     onObjectAdded: {
                         console.log("QML: object added: " + object.text + ", index= " + index);
                         backContextMenu.insertItem(index,object)
@@ -45,6 +34,33 @@ ApplicationWindow {
                 text: "<-"
                 onClicked: if (backContextMenu.items.length>0) backContextMenu.popup()
             }
+            // forward stuff
+            Menu {
+                id: forwardContextMenu
+                Instantiator {
+                    model: forwardModel
+                    MenuItem { text: model.text }
+                    onObjectAdded: {
+                        console.log("QML: object added: " + object.text + ", index= " + index);
+                        forwardContextMenu.insertItem(index,object)
+                        goForwardAction.enabled = true;
+                    }
+                    onObjectRemoved: {
+                        forwardContextMenu.removeItem(object)
+                        console.log("QML: object removed: " + object.text);
+                        if (forwardContextMenu.items.count == 0) goForwardAction.enabled = false
+                    }
+                }
+            }
+            Action {
+                id: goForwardAction
+                enabled: false
+            }
+            ToolButton {
+                action: goForwardAction
+                text: "->"
+                onClicked: if (forwardContextMenu.items.length>0) forwardContextMenu.popup()
+            }
         }
     }
     Rectangle {
@@ -61,9 +77,9 @@ ApplicationWindow {
         }
     }
     Component.onCompleted: {
-        backModel.add("d");
-        backModel.add("c");
-        backModel.add("b");
-        backModel.add("a");
+        backModel.add("dddddddddddd");
+        backModel.add("ccccccccc");
+        backModel.add("bbbbbb");
+        backModel.add("aaa");
     }
 }
